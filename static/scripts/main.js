@@ -37,26 +37,26 @@ function linguist(key, arg1, arg2) {
     		case "Untag":
     		//
     		    return phrases[key];
-    		    break;
+    		    //break;
     		case "ThereAreStillFilesBeingUploaded":
     		    return phrases.ThereAreStill + arg1 +
                     phrases.FilesBeingUploaded;
-    		    break;
+    		    //break;
     		case "Uploading":
     		    return phrases.Uploading + arg1;
-    		    break;
+    		    //break;
     		case "ErrorDuringUploadOfFile":
     		    return phrases.Error + "(" + arg1 + ")" +
                     phrases.DuringUploadOfFile + arg2;
-    		    break;
+    		    //break;
     		case "Success":
     		    return arg1 + ": " + phrases.UploadSuccess;
-    		    break;
+    		    //break;
     		default:
     		    return "";
 	    }
 	}
-};
+}
 /*
     AJAX
 */
@@ -80,7 +80,7 @@ function sequencialupload() {
 }
 
 function upload(file) {
-    if ( (ALLOWUPLOAD==undefined) || (ALLOWUPLOAD=="true") ){
+    if ( (ALLOWUPLOAD===undefined) || (ALLOWUPLOAD=="true") ){
     	$(".browse").addClass("uploading");
     	var li = $('<li>');
     	li.append($('<div style="clear:both;"><p>' +
@@ -121,7 +121,7 @@ function upload(file) {
         fq.push(file);
         sequencialupload();
     }
-};
+}
 /*
     Document Bindings
 */
@@ -129,13 +129,13 @@ $(document).ready(function() {
     var tmptheme = localStorage.getItem("theme");
     var gettheme = (tmptheme) ? tmptheme : theme;
     $(document.body).parent().attr("id", gettheme);
-	if ( (ALLOWUPLOAD==undefined) || (ALLOWUPLOAD=="true") ){
+	if ( (ALLOWUPLOAD===undefined) || (ALLOWUPLOAD=="true") ){
         // only show if on home, not on individual tag page
         if (!location.href.match(/[0-9a-f]{128}/)) {
         	$("#webupload").addClass("show");
         }
     }
-    if ( (ALLOWADDTAG==undefined) || (ALLOWADDTAG=="true") ) {
+    if ( (ALLOWADDTAG===undefined) || (ALLOWADDTAG=="true") ) {
     	$("#search").addClass("showtable");
     	$("#addtagform").addClass("show");
         $("#searchtopform").addClass("show");
@@ -149,12 +149,12 @@ $(document).ready(function() {
             "src":"https://www.youtube.com/embed/"+youtubevideoid+"?rel=0"
         }));
     } else if        ($("h2.page-header").text().match(/\/youtu\.be\//)) {
-        var erase = $("h2.page-header").text().match(/.*\/youtu\.be\//);
-        var youtubevideoid = $("h2.page-header").text().replace(erase,"").match(/[0-9a-zA-Z]{11}/);
+        var erase2 = $("h2.page-header").text().match(/.*\/youtu\.be\//);
+        var youtubevideoid2 = $("h2.page-header").text().replace(erase2,"").match(/[0-9a-zA-Z]{11}/);
         $("#content").append($('<iframe></iframe>').attr({
             "frameborder":"0",
             "allowfullscreen":"allowfullscreen",
-            "src":"https://www.youtube.com/embed/"+youtubevideoid+"?rel=0"
+            "src":"https://www.youtube.com/embed/"+youtubevideoid2+"?rel=0"
         }));
     } else if        ($("h2.page-header").text().match(
             /https?:\/\/soundcloud\.com\/[^/]*\/[^/]*/
@@ -189,7 +189,7 @@ $(document).ready(function() {
     tagsFor("card-tags", '');
 });
 $(window).bind("beforeunload", function(){
-	if (queue.length==0) {
+	if (queue.length===0) {
 	    return;
 	}
 	return linguist("ThereAreStillFilesBeingUploaded", queue.length);
@@ -247,7 +247,11 @@ $("#themebright").on("click", function(e){
     Media
 */
 $("video").on("click", function(e){
-    $(this).get(0).paused ? $(this).get(0).play() : $(this).get(0).pause();
+    if ($(this).get(0).paused) {
+        $(this).get(0).play();
+    } else {
+        $(this).get(0).pause();
+    }
 });
 
 })();

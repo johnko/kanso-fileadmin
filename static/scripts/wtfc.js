@@ -15,7 +15,7 @@ function isFile(obj){
     } else if (obj.name.match(/youtube\.com\/watch\?v=/)) {
     } else if (obj.name.match(/\/youtu\.be\//)) {
     } else if (obj.name.match(/https?:\/\/soundcloud\.com\/[^/]*\/[^/]*/)) {
-    } else if ((obj.type!='tag')&&(obj.size!=0)) {
+    } else if ((obj.type!='tag')&&(obj.size!==0)) {
     } else {
         isfile = false;
     }
@@ -32,7 +32,7 @@ function tagsDBRefreshMeta(recvObj) {
         if (!tagsDB[h]) {
             tagsDB[h] = {};
         }
-        tagsDB[h]["hash"] = h;
+        tagsDB[h].hash = h;
         $.each(o, function(k, v) {
             tagsDB[h][k] = v;
         });
@@ -71,43 +71,43 @@ function numberFormat(number) {
 }
 /*============================================================================*/
 function sortName(a, b) {
-    var aw = (a["name"]==undefined) ? '' : a["name"].toLowerCase();
-    var bw = (b["name"]==undefined) ? '' : b["name"].toLowerCase();
+    var aw = (a.name===undefined) ? '' : a.name.toLowerCase();
+    var bw = (b.name===undefined) ? '' : b.name.toLowerCase();
     return ((aw < bw) ? -1 : ((aw > bw) ? 1 : 0));
 }
 /*============================================================================*/
 function sortType(a, b) {
     var aw = (
-        a["type"]==undefined
-    ) ? '' : a["type"].toLowerCase();
+        a.type===undefined
+    ) ? '' : a.type.toLowerCase();
     aw = (aw=="tag") ? 'zzzzzzzzzz' : aw;
     var bw = (
-        b["type"]==undefined
-    ) ? '' : b["type"].toLowerCase();
+        b.type===undefined
+    ) ? '' : b.type.toLowerCase();
     bw = (bw=="tag") ? 'zzzzzzzzzz' : bw;
     return ((aw < bw) ? -1 : ((aw > bw) ? 1 : 0));
 }
 /*============================================================================*/
 function sortSize(a, b) {
-    var aw = (a["size"]==undefined) ? 0 : a["size"];
-    var bw = (b["size"]==undefined) ? 0 : b["size"];
+    var aw = (a.size===undefined) ? 0 : a.size;
+    var bw = (b.size===undefined) ? 0 : b.size;
     return aw - bw;
 }
 /*============================================================================*/
 function sortTime(a, b) {
     var aw = (
-        a["time"]==undefined
-    ) ? '' : a["time"].toLowerCase();
+        a.time===undefined
+    ) ? '' : a.time.toLowerCase();
     var bw = (
-        b["time"]==undefined
-    ) ? '' : b["time"].toLowerCase();
+        b.time===undefined
+    ) ? '' : b.time.toLowerCase();
     return ((aw < bw) ? -1 : ((aw > bw) ? 1 : 0));
 }
 /*============================================================================*/
 var MetaFileIcon = React.createClass({displayName: "MetaFileIcon",
     previewShow: function(event) {
         var divid = "#previewdiv"+this.props.hash;
-        if($.trim($(divid).html())=='') {
+        if($.trim($(divid).html())==='') {
             if (this.props.type.match(/image/)) {
                 $(divid).append($('<img/>').attr({
                     "id":"preview"+this.props.hash,
@@ -132,9 +132,11 @@ var MetaFileIcon = React.createClass({displayName: "MetaFileIcon",
                     "id":"preview"+this.props.hash,
                     "controls":"controls"
                 }).addClass("previewvideo").on("click",function(e){
-                    $(this).get(0).paused ?
-                    $(this).get(0).play() :
-                    $(this).get(0).pause();
+                    if ($(this).get(0).paused) {
+                        $(this).get(0).play();
+                    } else {
+                        $(this).get(0).pause();
+                    }
                 }).append($('<source/>').attr({
                     "src":"./raw/"+this.props.hash,
                     "type":this.props.type
@@ -158,16 +160,16 @@ var MetaFileIcon = React.createClass({displayName: "MetaFileIcon",
                     "style","display:block!important"
                 );
             } else if        (this.props.name.match(/\/youtu\.be\//)) {
-                var erase = this.props.name.match(/.*\/youtu\.be\//);
-                var youtubevideoid = this.props.name.replace(
-                    erase,''
+                var erase2 = this.props.name.match(/.*\/youtu\.be\//);
+                var youtubevideoid2 = this.props.name.replace(
+                    erase2,''
                 ).match(/[0-9a-zA-Z]{11}/);
                 $(divid).append(
                 $('<iframe></iframe>').attr({
                     "id":"preview"+this.props.hash,
                     "frameborder":"0",
                     "allowfullscreen":"allowfullscreen",
-                    "src":"https://www.youtube.com/embed/"+youtubevideoid+"?rel=0"
+                    "src":"https://www.youtube.com/embed/"+youtubevideoid2+"?rel=0"
                 }).addClass("previewyoutube"));
                 $(divid).attr(
                     "style","display:block!important"
@@ -201,7 +203,7 @@ var MetaFileIcon = React.createClass({displayName: "MetaFileIcon",
     },
     previewToggle: function(event) {
         var divid = "#previewdiv"+this.props.hash;
-        if($.trim($(divid).html())=='') {
+        if($.trim($(divid).html())==='') {
             this.previewShow(event);
         } else {
             this.previewHide(event);
@@ -212,49 +214,49 @@ var MetaFileIcon = React.createClass({displayName: "MetaFileIcon",
         if (this.props.type.match(/image/)) {
             typeicon = (
                 React.createElement("span", {
-                    className: "glyphicon glyphicon-picture", 
+                    className: "glyphicon glyphicon-picture",
                     "aria-hidden": "true"}
                 )
             );
         } else if (this.props.type.match(/audio/)) {
             typeicon = (
                 React.createElement("span", {
-                    className: "glyphicon glyphicon-music", 
+                    className: "glyphicon glyphicon-music",
                     "aria-hidden": "true"}
                 )
             );
         } else if (this.props.type.match(/video/)) {
             typeicon = (
                 React.createElement("span", {
-                    className: "glyphicon glyphicon-film", 
+                    className: "glyphicon glyphicon-film",
                     "aria-hidden": "true"}
                 )
             );
         } else if (this.props.type.match(/text/)) {
             typeicon = (
                 React.createElement("span", {
-                    className: "glyphicon glyphicon-text-size", 
+                    className: "glyphicon glyphicon-text-size",
                     "aria-hidden": "true"}
                 )
             );
         } else if (this.props.type.match(/pdf/)) {
             typeicon = (
                 React.createElement("span", {
-                    className: "glyphicon glyphicon-text-background", 
+                    className: "glyphicon glyphicon-text-background",
                     "aria-hidden": "true"}
                 )
             );
         } else if (this.props.name.match(/youtube\.com\/watch\?v=/)) {
             typeicon = (
                 React.createElement("span", {
-                    className: "glyphicon icon-youtube", 
+                    className: "glyphicon icon-youtube",
                     "aria-hidden": "true"}
                 )
             );
         } else if (this.props.name.match(/\/youtu\.be\//)) {
             typeicon = (
                 React.createElement("span", {
-                    className: "glyphicon icon-youtube", 
+                    className: "glyphicon icon-youtube",
                     "aria-hidden": "true"}
                 )
             );
@@ -263,14 +265,14 @@ var MetaFileIcon = React.createClass({displayName: "MetaFileIcon",
         ) {
             typeicon = (
                 React.createElement("span", {
-                    className: "glyphicon icon-soundcloud", 
+                    className: "glyphicon icon-soundcloud",
                     "aria-hidden": "true"}
                 )
             );
-        } else if ((this.props.type!='tag')&&(this.props.size!=0)) {
+        } else if ((this.props.type!='tag')&&(this.props.size!==0)) {
             typeicon = (
                 React.createElement("span", {
-                    className: "glyphicon glyphicon-file", 
+                    className: "glyphicon glyphicon-file",
                     "aria-hidden": "true"}
                 )
             );
@@ -278,15 +280,15 @@ var MetaFileIcon = React.createClass({displayName: "MetaFileIcon",
         if (isFile(this.props)) {
             return (
                 React.createElement("span", {
-                    className: this.props.myclass}, 
+                    className: this.props.myclass},
                     React.createElement("button", {
-                        className: "btn "+this.props.myclass, 
-                        onClick: this.previewToggle, 
-                        title: this.props.type}, 
+                        className: "btn "+this.props.myclass,
+                        onClick: this.previewToggle,
+                        title: this.props.type},
                         typeicon
-                    ), 
+                    ),
                     React.createElement("button", {
-                        className: "forcepreviewshow", 
+                        className: "forcepreviewshow",
                         onClick: this.previewShow})
                 )
             );
@@ -304,9 +306,9 @@ var TagTableRow = React.createClass({displayName: "TagTableRow",
         ) ? this.props.done : false;
         var newtick = (ticked) ? false : true;
         // save not now, but when we ajax
-        tagsDB[hash]["done"] = newtick;
+        tagsDB[hash].done = newtick;
         this.props.onLoadTagsFromLocal();
-        if ( (ALLOWADDTAG==undefined) || (ALLOWADDTAG=="true") ) {
+        if ( (ALLOWADDTAG===undefined) || (ALLOWADDTAG=="true") ) {
             localStorage.setItem("tagsDB", JSON.stringify(tagsDB));
             // now actually do the query
             var donehash = "07b8a32b38151e20c27bf64ee5fa32cf2f19e2ef0f749e50"+
@@ -379,20 +381,20 @@ var TagTableRow = React.createClass({displayName: "TagTableRow",
         var rawbutton = '';
         var typeicon = (
             React.createElement(MetaFileIcon, {
-                hash: this.props.hash, 
-                type: this.props.type, 
-                name: this.props.name, 
+                hash: this.props.hash,
+                type: this.props.type,
+                name: this.props.name,
                 myclass: "typeicon"}
             )
         );
-        if ((this.props.type!='tag')&&(this.props.size!=0)) {
-            if ( (SHOWRAWBUTTON==undefined) || (SHOWRAWBUTTON=="true") ) {
+        if ((this.props.type!='tag')&&(this.props.size!==0)) {
+            if ( (SHOWRAWBUTTON===undefined) || (SHOWRAWBUTTON=="true") ) {
                 rawbutton = (
                     React.createElement("a", {
-                        className: "btn btn-warning", 
-                        href: "./raw/" + this.props.hash}, 
+                        className: "btn btn-warning",
+                        href: "./raw/" + this.props.hash},
                         React.createElement("span", {
-                            className: "glyphicon glyphicon-download-alt", 
+                            className: "glyphicon glyphicon-download-alt",
                             "aria-hidden": "true"}
                         )
                     )
@@ -403,10 +405,10 @@ var TagTableRow = React.createClass({displayName: "TagTableRow",
         if (this.props.done) {
             doneornot = (
                 React.createElement("button", {
-                    onClick: this.toggleTick, 
-                    className: "tagtick btn btn-default"}, 
+                    onClick: this.toggleTick,
+                    className: "tagtick btn btn-default"},
                     React.createElement("span", {
-                        className: "glyphicon glyphicon-ok", 
+                        className: "glyphicon glyphicon-ok",
                         "aria-hidden": "true"}
                     )
                 )
@@ -414,19 +416,19 @@ var TagTableRow = React.createClass({displayName: "TagTableRow",
         } else {
             doneornot = (
                 React.createElement("button", {
-                    onClick: this.toggleTick, 
-                    className: "tagtick btn btn-default"}, 
+                    onClick: this.toggleTick,
+                    className: "tagtick btn btn-default"},
                     React.createElement("span", {
-                        className: "glyphicon glyphicon-unchecked", 
+                        className: "glyphicon glyphicon-unchecked",
                         "aria-hidden": "true"}
                     )
                 )
             );
         }
         var cellsize = (React.createElement("td", null));
-        if (this.props.size!=0) {
+        if (this.props.size!==0) {
             cellsize = (
-                React.createElement("td", {className: "tablenumber"}, 
+                React.createElement("td", {className: "tablenumber"},
                     numberFormat(this.props.size)
                 )
             );
@@ -434,32 +436,32 @@ var TagTableRow = React.createClass({displayName: "TagTableRow",
         var celltime = (React.createElement("td", null));
         if (this.props.time) {
             celltime = (
-                React.createElement("td", {className: "tabletime"}, 
+                React.createElement("td", {className: "tabletime"},
                     React.createElement("span", {
-                        className: "pull-left"}, 
+                        className: "pull-left"},
                         timeLongFormatDate(this.props.time)
-                    ), 
+                    ),
                     React.createElement("span", {
-                        className: "pull-left"}, 
+                        className: "pull-left"},
                         timeLongFormatTime(this.props.time)
-                    ), 
+                    ),
                     React.createElement("span", {
-                        className: "pull-left", 
+                        className: "pull-left",
                         "data-livestamp": Date.parse(this.props.time)/1000}
                     )
                 )
             );
         }
         var celldeletetag = '';
-    	if ( (ALLOWDELTAG==undefined) || (ALLOWDELTAG=="true") ) {
+    	if ( (ALLOWDELTAG===undefined) || (ALLOWDELTAG=="true") ) {
             if (getHashFromLocation()) {
                 celldeletetag = (
                     React.createElement("button", {
-                        className: "btn btn-danger", 
-                        data: this.props.hash, 
-                        onClick: this.deleteHash}, 
+                        className: "btn btn-danger",
+                        data: this.props.hash,
+                        onClick: this.deleteHash},
                         React.createElement("span", {
-                            className: "glyphicon glyphicon-trash", 
+                            className: "glyphicon glyphicon-trash",
                             "aria-hidden": "true"}
                         )
                     )
@@ -487,32 +489,32 @@ var TagTableRow = React.createClass({displayName: "TagTableRow",
             }
         }
         return (
-            React.createElement("tr", {className: "tagitem "+doneClass}, 
-                React.createElement("td", null, 
+            React.createElement("tr", {className: "tagitem "+doneClass},
+                React.createElement("td", null,
                     doneornot
-                ), 
-                React.createElement("td", {className: "tabletype"}, 
+                ),
+                React.createElement("td", {className: "tabletype"},
                     typeicon
-                ), 
-                React.createElement("td", {className: "tagname"}, 
+                ),
+                React.createElement("td", {className: "tagname"},
                     React.createElement("a", {
-                        href: "./get/" + this.props.hash, 
-                        className: "tagname"}, 
+                        href: "./get/" + this.props.hash,
+                        className: "tagname"},
                         strippedname
-                    ), 
-                    ' ', 
-                    externalurl, 
-                    tagscount, 
+                    ),
+                    ' ',
+                    externalurl,
+                    tagscount,
                     React.createElement("div", {
-                        id: "previewdiv"+this.props.hash, 
+                        id: "previewdiv"+this.props.hash,
                         className: "previewdiv"})
-                ), 
-                cellsize, 
-                React.createElement("td", {className: "tabletype"}, 
+                ),
+                cellsize,
+                React.createElement("td", {className: "tabletype"},
                     rawbutton
-                ), 
-                celltime, 
-                React.createElement("td", null, 
+                ),
+                celltime,
+                React.createElement("td", null,
                     celldeletetag
                 )
             )
@@ -640,24 +642,24 @@ var TagsTable = React.createClass({displayName: "TagsTable",
                 var matchname = true;
                 if (this.state.filtername.length > 0) {
                     var regexname = new RegExp(this.state.filtername,"i");
-                    matchname = regexname.test(o.name)
+                    matchname = regexname.test(o.name);
                 }
                 var matchtime = true;
                 if (this.state.filtertime.length > 0) {
                     var regextime = new RegExp(this.state.filtertime,"i");
-                    matchtime = regextime.test(timeLongFormat(o.time))
+                    matchtime = regextime.test(timeLongFormat(o.time));
                 }
                 if ( (matchname) && (matchtime) ) {
                     tagNodesTwo.push(
                         React.createElement(TagTableRow, {
-                            hash: o.hash, 
-                            name: o.name, 
-                            type: o.type, 
-                            size: o.size, 
-                            time: o.time, 
-                            done: o.done, 
-                            count: o.tags.length, 
-                            onDeleteHash: this.deleteHash, 
+                            hash: o.hash,
+                            name: o.name,
+                            type: o.type,
+                            size: o.size,
+                            time: o.time,
+                            done: o.done,
+                            count: o.tags.length,
+                            onDeleteHash: this.deleteHash,
                             onLoadTagsFromLocal: this.loadTagsFromLocal}
                         )
                     );
@@ -679,117 +681,117 @@ var TagsTable = React.createClass({displayName: "TagsTable",
         switch(this.props.sort) {
             case "nameaz":
             case "nameza":
-                classObj["name"] = " btn-primary";
+                classObj.name = " btn-primary";
                 break;
             case "typeaz":
             case "typeza":
-                classObj["type"] = " btn-primary";
+                classObj.type = " btn-primary";
                 break;
             case "sizebigsmall":
             case "sizesmallbig":
-                classObj["size"] = " btn-primary";
+                classObj.size = " btn-primary";
                 break;
             case "timenewold":
             case "timeoldnew":
-                classObj["time"] = " btn-primary";
+                classObj.time = " btn-primary";
                 break;
         }
-        classObj["done"] = (this.props.hidedone) ? " btn-primary" : '';
+        classObj.done = (this.props.hidedone) ? " btn-primary" : '';
         return (
             React.createElement("table", {
-                className: tableClass}, 
-                React.createElement("thead", null, 
-                    React.createElement("tr", null, 
-                        React.createElement("th", null, 
+                className: tableClass},
+                React.createElement("thead", null,
+                    React.createElement("tr", null,
+                        React.createElement("th", null,
                             React.createElement("button", {
-                                type: "button", 
-                                className: "btn btn-default"+classObj["done"], 
-                                "aria-expanded": "false", 
-                                onClick: this.changeHideDone}, 
+                                type: "button",
+                                className: "btn btn-default"+classObj.done,
+                                "aria-expanded": "false",
+                                onClick: this.changeHideDone},
                                 React.createElement("span", {
-                        className: "glyphicon glyphicon-eye"+openclose, 
+                        className: "glyphicon glyphicon-eye"+openclose,
                         "aria-hidden": "true"}
                                 )
-                            ), 
-                            React.createElement("br", null), 
+                            ),
+                            React.createElement("br", null),
 "DONE"
-                        ), 
-                        React.createElement("th", {className: "tabletype"}, 
+                        ),
+                        React.createElement("th", {className: "tabletype"},
                             React.createElement("button", {
-                                type: "button", 
-                                className: "btn btn-default"+classObj["type"], 
-                                "aria-expanded": "false", 
-                                onClick: this.clickSortTypeToggle}, 
+                                type: "button",
+                                className: "btn btn-default"+classObj.type,
+                                "aria-expanded": "false",
+                                onClick: this.clickSortTypeToggle},
                                 React.createElement("span", {
-                        className: "glyphicon glyphicon glyphicon-sort", 
+                        className: "glyphicon glyphicon glyphicon-sort",
                         "aria-hidden": "true"}
                                 )
-                            ), 
-                            React.createElement("br", null), 
+                            ),
+                            React.createElement("br", null),
 "TYPE"
-                        ), 
-                        React.createElement("th", null, 
+                        ),
+                        React.createElement("th", null,
                             React.createElement("button", {
-                                type: "button", 
-                                className: "btn btn-default"+classObj["name"], 
-                                "aria-expanded": "false", 
-                                onClick: this.clickSortNameToggle}, 
+                                type: "button",
+                                className: "btn btn-default"+classObj.name,
+                                "aria-expanded": "false",
+                                onClick: this.clickSortNameToggle},
                                 React.createElement("span", {
-                        className: "glyphicon glyphicon-sort-by-alphabet"+alt, 
+                        className: "glyphicon glyphicon-sort-by-alphabet"+alt,
                         "aria-hidden": "true"}
                                 )
-                            ), 
+                            ),
                             React.createElement("input", {
-                                type: "text", 
-                                className: "filters", 
-                                id: "filterNameInput", 
-                                placeholder: "Filter by...", 
-                                onChange: this.handleFilter, 
+                                type: "text",
+                                className: "filters",
+                                id: "filterNameInput",
+                                placeholder: "Filter by...",
+                                onChange: this.handleFilter,
                                 value: this.props.filterName}
-                            ), 
-                            React.createElement("br", null), 
+                            ),
+                            React.createElement("br", null),
 "NAME"
-                        ), 
-                        React.createElement("th", null, 
+                        ),
+                        React.createElement("th", null,
                             React.createElement("button", {
-                                type: "button", 
-                                className: "btn btn-default"+classObj["size"], 
-                                "aria-expanded": "false", 
-                                onClick: this.clickSortSizeToggle}, 
+                                type: "button",
+                                className: "btn btn-default"+classObj.size,
+                                "aria-expanded": "false",
+                                onClick: this.clickSortSizeToggle},
                                 React.createElement("span", {
-                    className: "glyphicon glyphicon-sort-by-attributes"+alt, 
+                    className: "glyphicon glyphicon-sort-by-attributes"+alt,
                     "aria-hidden": "true"}
                                 )
-                            ), 
-                            React.createElement("br", null), 
+                            ),
+                            React.createElement("br", null),
 "SIZE (bytes)"
-                        ), 
-                        React.createElement("th", null), 
-                        React.createElement("th", {colSpan: "2"}, 
+                        ),
+                        React.createElement("th", null),
+                        React.createElement("th", {colSpan: "2"},
                             React.createElement("button", {
-                                type: "button", 
-                                className: "btn btn-default"+classObj["time"], 
-                                "aria-expanded": "false", 
-                                onClick: this.clickSortTimeToggle}, 
+                                type: "button",
+                                className: "btn btn-default"+classObj.time,
+                                "aria-expanded": "false",
+                                onClick: this.clickSortTimeToggle},
                                 React.createElement("span", {
-                        className: "glyphicon glyphicon-sort-by-order"+alt, 
+                        className: "glyphicon glyphicon-sort-by-order"+alt,
                         "aria-hidden": "true"}
                                 )
-                            ), 
+                            ),
                             React.createElement("input", {
-                                type: "text", 
-                                className: "filters", 
-                                id: "filterTimeInput", 
-                                placeholder: "Filter by...", 
-                                onChange: this.handleFilter, 
+                                type: "text",
+                                className: "filters",
+                                id: "filterTimeInput",
+                                placeholder: "Filter by...",
+                                onChange: this.handleFilter,
                                 value: this.props.filterTime}
-                            ), 
-                            React.createElement("br", null), 
+                            ),
+                            React.createElement("br", null),
 "DATE TIME"
                         )
                     )
-                ), 
-                React.createElement("tbody", null, 
+                ),
+                React.createElement("tbody", null,
                     tagNodesTwo
                 )
             )
@@ -934,8 +936,8 @@ var TagsOuter = React.createClass({displayName: "TagsOuter",
     hashesToObject: function(hash) {
         var obj = {};
         if (tagsDB[hash]) {
-            if (tagsDB[hash]["tags"]) {
-                $.each(tagsDB[hash]["tags"], function(i, h) {
+            if (tagsDB[hash].tags) {
+                $.each(tagsDB[hash].tags, function(i, h) {
                     if (tagsDB[h]) {
                         obj[h] = tagsDB[h];
                     }
@@ -959,7 +961,7 @@ var TagsOuter = React.createClass({displayName: "TagsOuter",
         if (tagsObj) {
             // parse all objects
             $.each(tagsObj, function(h, o) {
-                o["hash"] = h;
+                o.hash = h;
                 tagsArray.push(o);
             });
         }
@@ -1039,9 +1041,9 @@ var TagsOuter = React.createClass({displayName: "TagsOuter",
     deleteHash: function(delhash) {
 //DEBUGconsole.log('TagsOuter deleteHash');
         var hash = getHashFromLocation();
-        var index = tagsDB[hash]["tags"].indexOf(delhash);
+        var index = tagsDB[hash].tags.indexOf(delhash);
         if (index > -1) {
-            tagsDB[hash]["tags"].splice(index, 1);
+            tagsDB[hash].tags.splice(index, 1);
         }
         delete this.state.data[delhash];
         this.setState({
@@ -1090,21 +1092,21 @@ var TagsOuter = React.createClass({displayName: "TagsOuter",
                 case "table":
                     viewTagsAs = (
                         React.createElement(TagsTable, {
-                            data: this.state.data, 
-                            sort: this.state.sort, 
-                            hidedone: this.state.hidedone, 
-                            filtername: this.state.filtername, 
-                            filtertime: this.state.filtertime, 
-                            onDeleteHash: this.deleteHash, 
-                            onChangeHideDone: this.changeHideDone, 
-                            onLoadTagsFromLocal: this.loadTagsFromLocal, 
-                            onClickSortNameAZ: this.clickSortNameAZ, 
-                            onClickSortNameZA: this.clickSortNameZA, 
-                            onClickSortTimeNewOld: this.clickSortTimeNewOld, 
-                            onClickSortTimeOldNew: this.clickSortTimeOldNew, 
-                            onClickSortSizeBigSmall: this.clickSortSizeBigSmall, 
-                            onClickSortSizeSmallBig: this.clickSortSizeSmallBig, 
-                            onClickSortTypeAZ: this.clickSortTypeAZ, 
+                            data: this.state.data,
+                            sort: this.state.sort,
+                            hidedone: this.state.hidedone,
+                            filtername: this.state.filtername,
+                            filtertime: this.state.filtertime,
+                            onDeleteHash: this.deleteHash,
+                            onChangeHideDone: this.changeHideDone,
+                            onLoadTagsFromLocal: this.loadTagsFromLocal,
+                            onClickSortNameAZ: this.clickSortNameAZ,
+                            onClickSortNameZA: this.clickSortNameZA,
+                            onClickSortTimeNewOld: this.clickSortTimeNewOld,
+                            onClickSortTimeOldNew: this.clickSortTimeOldNew,
+                            onClickSortSizeBigSmall: this.clickSortSizeBigSmall,
+                            onClickSortSizeSmallBig: this.clickSortSizeSmallBig,
+                            onClickSortTypeAZ: this.clickSortTypeAZ,
                             onClickSortTypeZA: this.clickSortTypeZA}
                         )
                     );
@@ -1125,73 +1127,73 @@ var TagsOuter = React.createClass({displayName: "TagsOuter",
                     switch(this.state.sort) {
                         case "nameaz":
                         case "nameza":
-                            classObj["name"] = " btn-primary";
+                            classObj.name = " btn-primary";
                             break;
                         case "typeaz":
                         case "typeza":
-                            classObj["type"] = " btn-primary";
+                            classObj.type = " btn-primary";
                             break;
                         case "sizebigsmall":
                         case "sizesmallbig":
-                            classObj["size"] = " btn-primary";
+                            classObj.size = " btn-primary";
                             break;
                         case "timenewold":
                         case "timeoldnew":
-                            classObj["time"] = " btn-primary";
+                            classObj.time = " btn-primary";
                             break;
                     }
                     tagSortBar = (
                         React.createElement("div", {
-                            className: "pull-left tagoptions"}, 
+                            className: "pull-left tagoptions"},
                             React.createElement("div", {
-                                className: "btn-group", 
-                                role: "group", 
-                                "aria-label": "..."}, 
+                                className: "btn-group",
+                                role: "group",
+                                "aria-label": "..."},
                                 React.createElement("button", {
-                                    type: "button", 
-                            className: "btn btn-default"+classObj["type"], 
-                            "aria-expanded": "false", 
-                                    onClick: this.clickSortTypeAZ}, 
+                                    type: "button",
+                            className: "btn btn-default"+classObj.type,
+                            "aria-expanded": "false",
+                                    onClick: this.clickSortTypeAZ},
                                     React.createElement("span", {
-                        className: "glyphicon glyphicon glyphicon-sort", 
+                        className: "glyphicon glyphicon glyphicon-sort",
                         "aria-hidden": "true"}
-                                    ), React.createElement("span", {className: "btnlabel"}, 
+                                    ), React.createElement("span", {className: "btnlabel"},
 "Type"
                                     )
-                                ), 
+                                ),
                                 React.createElement("button", {
-                                    type: "button", 
-                            className: "btn btn-default"+classObj["name"], 
-                            "aria-expanded": "false", 
-                                    onClick: this.clickSortNameAZ}, 
+                                    type: "button",
+                            className: "btn btn-default"+classObj.name,
+                            "aria-expanded": "false",
+                                    onClick: this.clickSortNameAZ},
                                     React.createElement("span", {
-                        className: "glyphicon glyphicon-sort-by-alphabet", 
+                        className: "glyphicon glyphicon-sort-by-alphabet",
                         "aria-hidden": "true"}
-                                    ), React.createElement("span", {className: "btnlabel"}, 
+                                    ), React.createElement("span", {className: "btnlabel"},
 "Name"
                                     )
-                                ), 
+                                ),
                                 React.createElement("button", {
-                                    type: "button", 
-                            className: "btn btn-default"+classObj["size"], 
-                            "aria-expanded": "false", 
-                                    onClick: this.clickSortSizeBigSmall}, 
+                                    type: "button",
+                            className: "btn btn-default"+classObj.size,
+                            "aria-expanded": "false",
+                                    onClick: this.clickSortSizeBigSmall},
                                     React.createElement("span", {
-                        className: "glyphicon glyphicon-sort-by-attributes-alt", 
+                        className: "glyphicon glyphicon-sort-by-attributes-alt",
                         "aria-hidden": "true"}
-                                    ), React.createElement("span", {className: "btnlabel"}, 
+                                    ), React.createElement("span", {className: "btnlabel"},
 "Largest"
                                     )
-                                ), 
+                                ),
                                 React.createElement("button", {
-                                    type: "button", 
-                            className: "btn btn-default"+classObj["time"], 
-                            "aria-expanded": "false", 
-                                    onClick: this.clickSortTimeNewOld}, 
+                                    type: "button",
+                            className: "btn btn-default"+classObj.time,
+                            "aria-expanded": "false",
+                                    onClick: this.clickSortTimeNewOld},
                                     React.createElement("span", {
-                        className: "glyphicon glyphicon-time", 
+                        className: "glyphicon glyphicon-time",
                         "aria-hidden": "true"}
-                                    ), React.createElement("span", {className: "btnlabel"}, 
+                                    ), React.createElement("span", {className: "btnlabel"},
 "Newest"
                                     )
                                 )
@@ -1202,61 +1204,61 @@ var TagsOuter = React.createClass({displayName: "TagsOuter",
             }
             var refresh = (
                 React.createElement("button", {
-                    type: "button", 
-                    className: "btn btn-default", 
-                    id: "fetchtags", 
+                    type: "button",
+                    className: "btn btn-default",
+                    id: "fetchtags",
                     onClick: this.clickRefreshTags
-                    }, 
+                    },
                     React.createElement("span", {
-                        className: "glyphicon glyphicon-refresh", 
+                        className: "glyphicon glyphicon-refresh",
                         "aria-hidden": "true"}
-                    ), React.createElement("span", {className: "btnlabel"}, 
+                    ), React.createElement("span", {className: "btnlabel"},
 "Refresh"
                     )
                 )
             );
             var tabletile = (
                 React.createElement("button", {
-                    type: "button", 
-                    className: "btn btn-default", 
-                    onClick: this.clickViewAs}, 
+                    type: "button",
+                    className: "btn btn-default",
+                    onClick: this.clickViewAs},
                     React.createElement("span", {
-                        className: "glyphicon glyphicon-th-list", 
+                        className: "glyphicon glyphicon-th-list",
                         "aria-hidden": "true"}
-                    ), React.createElement("span", {className: "btnlabel"}, 
+                    ), React.createElement("span", {className: "btnlabel"},
 "Table/Tiles"
                     )
                 )
             );
             var previewall = (
                 React.createElement("button", {
-                    type: "button", 
-                    className: "btn btn-default", 
-                    onClick: this.clickPreviewAll}, 
+                    type: "button",
+                    className: "btn btn-default",
+                    onClick: this.clickPreviewAll},
                     React.createElement("span", {
-                        className: "glyphicon glyphicon-glass", 
+                        className: "glyphicon glyphicon-glass",
                         "aria-hidden": "true"}
-                    ), React.createElement("span", {className: "btnlabel"}, 
+                    ), React.createElement("span", {className: "btnlabel"},
 "Load Previews"
                     )
                 )
             );
             var addtagform = '';
-            if ( (ALLOWADDTAG==undefined) || (ALLOWADDTAG=="true") ) {
+            if ( (ALLOWADDTAG===undefined) || (ALLOWADDTAG=="true") ) {
                 addtagform = (
-                    React.createElement("form", {className: "form-inline"}, 
-                		React.createElement("div", {className: "form-group"}, 
+                    React.createElement("form", {className: "form-inline"},
+                		React.createElement("div", {className: "form-group"},
                 		    React.createElement("input", {
-                                type: "text", 
-                                className: "form-control", 
-                                id: "addtaginput", 
+                                type: "text",
+                                className: "form-control",
+                                id: "addtaginput",
                                 placeholder: "tag"})
-                		), 
+                		),
                 		React.createElement("button", {
-                            type: "submit", 
-                            className: "btn btn-success", 
-                            id: "addtagbutton", 
-                            onClick: this.addTag}, 
+                            type: "submit",
+                            className: "btn btn-success",
+                            id: "addtagbutton",
+                            onClick: this.addTag},
 "Add tag"
                         )
                     )
@@ -1264,38 +1266,38 @@ var TagsOuter = React.createClass({displayName: "TagsOuter",
             }
             if (getHashFromLocation()) {
                 return (
-                    React.createElement("div", {className: "tagsouter"}, 
-                        React.createElement("h4", null, this.props.title), 
-                        addtagform, 
-                        React.createElement("div", {className: "pull-left tagoptions"}, 
+                    React.createElement("div", {className: "tagsouter"},
+                        React.createElement("h4", null, this.props.title),
+                        addtagform,
+                        React.createElement("div", {className: "pull-left tagoptions"},
                             React.createElement("div", {
-                                className: "btn-group", 
-                                role: "group", 
-                                "aria-label": "..."}, 
-                                tabletile, 
-                                previewall, 
+                                className: "btn-group",
+                                role: "group",
+                                "aria-label": "..."},
+                                tabletile,
+                                previewall,
                                 refresh
                             )
-                        ), 
-                        tagSortBar, 
+                        ),
+                        tagSortBar,
                         viewTagsAs
                     )
                 );
             } else {
                 //no refresh
                 return (
-                    React.createElement("div", {className: "tagsouter"}, 
-                        React.createElement("h4", null, this.props.title), 
-                        React.createElement("div", {className: "pull-left tagoptions"}, 
+                    React.createElement("div", {className: "tagsouter"},
+                        React.createElement("h4", null, this.props.title),
+                        React.createElement("div", {className: "pull-left tagoptions"},
                             React.createElement("div", {
-                                className: "btn-group", 
-                                role: "group", 
-                                "aria-label": "..."}, 
-                                tabletile, 
+                                className: "btn-group",
+                                role: "group",
+                                "aria-label": "..."},
+                                tabletile,
                                 previewall
                             )
-                        ), 
-                        tagSortBar, 
+                        ),
+                        tagSortBar,
                         viewTagsAs
                     )
                 );
@@ -1310,16 +1312,16 @@ var TagListBButton = React.createClass({displayName: "TagListBButton",
     render: function() {
         var typeicon = (
             React.createElement(MetaFileIcon, {
-                hash: this.props.hash, 
-                type: this.props.type, 
-                name: this.props.name, 
+                hash: this.props.hash,
+                type: this.props.type,
+                name: this.props.name,
                 myclass: "typeicon"}
             )
         );
         var metasize = '';
-        if (this.props.size!=0) {
+        if (this.props.size!==0) {
             metasize = (
-                React.createElement("span", {className: "size"}, 
+                React.createElement("span", {className: "size"},
                     numberFormat(this.props.size) + " bytes"
                 )
             );
@@ -1328,7 +1330,7 @@ var TagListBButton = React.createClass({displayName: "TagListBButton",
         if (this.props.time) {
             metatime = (
                 React.createElement("span", {
-                    className: "time", 
+                    className: "time",
                     "data-livestamp": Date.parse(this.props.time)/1000}
                 )
             );
@@ -1349,17 +1351,17 @@ var TagListBButton = React.createClass({displayName: "TagListBButton",
             );
             //has external url
             dropdown = (
-                React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+                React.createElement("ul", {className: "dropdown-menu", role: "menu"},
                     externalurl
                 )
             );
             dropbutton = (
                 React.createElement("button", {
-                    type: "button", 
-                    className: "btn dropdown-toggle", 
-                    "data-toggle": "dropdown", 
-                    "aria-expanded": "false"}, 
-                    React.createElement("span", {className: "glyphicon glyphicon-option-vertical"}), 
+                    type: "button",
+                    className: "btn dropdown-toggle",
+                    "data-toggle": "dropdown",
+                    "aria-expanded": "false"},
+                    React.createElement("span", {className: "glyphicon glyphicon-option-vertical"}),
                     React.createElement("span", {className: "sr-only"}, "Toggle Dropdown")
                 )
             );
@@ -1372,27 +1374,27 @@ var TagListBButton = React.createClass({displayName: "TagListBButton",
         }
         var mainbutton = (
             React.createElement("a", {
-                href: "./get/"+this.props.hash, 
-                type: "button", 
-                className: "tagname"}, 
-                strippedname, 
+                href: "./get/"+this.props.hash,
+                type: "button",
+                className: "tagname"},
+                strippedname,
                 tagscount
             )
         );
         return (
-            React.createElement("li", {className: "tagitem"}, 
-                React.createElement("div", {className: "tagwrapper"}, 
-                    React.createElement("div", {className: "tagtop"}, 
-                        typeicon, 
-                        dropbutton, 
-                        mainbutton, 
+            React.createElement("li", {className: "tagitem"},
+                React.createElement("div", {className: "tagwrapper"},
+                    React.createElement("div", {className: "tagtop"},
+                        typeicon,
+                        dropbutton,
+                        mainbutton,
                         dropdown
-                    ), 
+                    ),
                     React.createElement("div", {
-                        id: "previewdiv"+this.props.hash, 
-                        className: "previewdiv"}), 
-                    metasize, 
-                    metatime, 
+                        id: "previewdiv"+this.props.hash,
+                        className: "previewdiv"}),
+                    metasize,
+                    metatime,
                     React.createElement("div", {
                         className: "tagbottom"}
                     )
@@ -1409,18 +1411,18 @@ var TagsListB = React.createClass({displayName: "TagsListB",
             if ( (o.name) && (o.time) ) {
                 tagNodes.push(
                     React.createElement(TagListBButton, {
-                        hash: o.hash, 
-                        name: o.name, 
-                        type: o.type, 
-                        size: o.size, 
-                        time: o.time, 
+                        hash: o.hash,
+                        name: o.name,
+                        type: o.type,
+                        size: o.size,
+                        time: o.time,
                         count: o.tags.length}
                     )
                 );
             }
         }.bind(this));
         return (
-            React.createElement("ul", {className: "taglist"}, 
+            React.createElement("ul", {className: "taglist"},
                 tagNodes
             )
         );
@@ -1431,7 +1433,7 @@ function tagsFor(id, title) {
     if (document.getElementById(id)) {
         React.render(
             React.createElement(TagsOuter, {
-                title: title, 
+                title: title,
                 pollIntervalRemote: POLLINTERVALREMOTE}
             ),
             document.getElementById(id)
