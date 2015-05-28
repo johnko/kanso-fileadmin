@@ -1,0 +1,18 @@
+{
+    "name": "wtfc",
+    "version": "0.0.1",
+    "realname": "WTFC",
+    "description": "A CouchApp for managing attachments stored in DTFC.",
+    "attachments": ["static"],
+    "load": "lib/app",
+    "modules": ["lib"],
+    "dependencies": {
+        "attachments": null,
+        "modules": null,
+        "properties": null,
+        "settings": null,
+        "kanso-topbar": null,
+        "users": null,
+        "session": null
+    }
+}
