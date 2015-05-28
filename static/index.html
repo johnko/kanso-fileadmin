@@ -3,10 +3,9 @@
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!-->
-<html id="dark" class="no-js">
+<html id="bright" class="no-js">
 <!--<![endif]-->
 <head>
-    <base href="{{.NonRootHostPath}}/"><!-- NONROOTPATH -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,10 +16,10 @@
     <meta name="description" content="A collection of bits and bytes.">
 
 
-    <link href="./favicon.ico" rel="shortcut icon">
+    <link href="./static/favicon.ico" rel="shortcut icon">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <link rel="stylesheet" href="./styles/main.css">
-    <script src="./scripts/vendor/modernizr.js"></script>
+    <link rel="stylesheet" href="./static/styles/main.css">
+    <script src="./static/scripts/vendor/modernizr.js"></script>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -32,12 +31,12 @@
 
 <body class="home">
 <script>
-var ALLOWUPLOAD = {{.AllowUpload}};
-var ALLOWADDTAG = {{.AllowAddTag}};
-var ALLOWDELTAG = {{.AllowDelTag}};
-var SHOWRAWBUTTON = {{.ShowRawButton}};
-var NONROOTPATH = {{.NonRootPath}};
-var POLLINTERVALREMOTE = parseInt({{.PollIntervalRemote}});
+var ALLOWUPLOAD = "true";
+var ALLOWADDTAG = "true";
+var ALLOWDELTAG = "true";
+var RAWLINK = "true";
+var NONROOTPATH = "";
+var POLLINTERVALREMOTE = parseInt("0");
 </script>
 <nav class="navbar navbar-default">
     <div class="container-fluid">
@@ -51,7 +50,7 @@ var POLLINTERVALREMOTE = parseInt({{.PollIntervalRemote}});
     	    </button>
     	    <a class="navbar-brand"
 href="./"
-    	    ><img alt="Brand" width="20" height="20" src="./images/brand.png" /></a>
+    	    ><img alt="Brand" width="20" height="20" src="./static/images/brand.png" /></a>
     	</div>
 
     	<!-- Collect the nav links, forms, and other content for toggling -->
@@ -80,11 +79,6 @@ About
 <li><a href="http://facebook.github.io/react/">React by Facebook</a></li>
 <li><a href="http://modernizr.com/">modernizr</a></li>
 <li><a href="http://medialize.github.io/URI.js/">URI.js</a></li>
-<li><a href="https://golang.org/">Go by Google</a></li>
-<li><a href="https://github.com/kennygrant/sanitize">
-    kennygrant/sanitize</a></li>
-<li><a href="https://github.com/gorilla/mux">gorilla/mux</a></li>
-<li><a href="https://github.com/PuerkitoBio/ghost">PuerkitoBio/ghost</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
@@ -281,9 +275,8 @@ TL;DR  Enable JavaScript to use this site.
     </div>
 </footer>-->
 
-<script src="./scripts/main.js"></script>
+<script src="./static/scripts/main.js"></script>
 
 
 </body>
 </html>
-
