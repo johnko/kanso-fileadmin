@@ -1160,6 +1160,7 @@ var TagsOuter = React.createClass({
                         "&endkey=" + encodeURIComponent('"' + wordtag + '\\ufff0' + '"') +
                         "&include_docs=true";
                 } else {
+                    setNameHeader("all files")
                     fronthash = "./_ddoc/_view/dtfcdocs?include_docs=true";
                 }
             }
