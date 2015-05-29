@@ -1,15 +1,17 @@
 function tagsDBLoad() {
-    var tagsDB = JSON.parse(localStorage.getItem("tagsDB"));
+    //var tagsDB = JSON.parse(localStorage.getItem("tagsDB"));
     return (tagsDB) ? tagsDB : {};
 }
 
 function docsDBLoad() {
-    var docsDB = JSON.parse(localStorage.getItem("docsDB"));
+    //var docsDB = JSON.parse(localStorage.getItem("docsDB"));
     return (docsDB) ? docsDB : {};
 }
 // global
-var tagsDB = tagsDBLoad();
-var docsDB = docsDBLoad();
+//var tagsDB = tagsDBLoad();
+var tagsDB = {};
+//var docsDB = docsDBLoad();
+var docsDB = {};
 /*============================================================================*/
 function isFile(obj) {
     var isfile = true;
@@ -55,7 +57,8 @@ function tagsDBRefreshMeta(recvObj) {
                 }
             }
         });
-        localStorage.setItem("tagsDB", JSON.stringify(tagsDB));
+        //localStorage.setItem("tagsDB", JSON.stringify(tagsDB));
+        //localStorage.setItem("docsDB", JSON.stringify(docsDB));
     }
 }
 /*============================================================================*/
@@ -332,7 +335,7 @@ var TagTableRow = React.createClass({
         tagsDB[hash].done = newtick;
         this.props.onLoadTagsFromLocal();
         if ((ALLOWADDTAG === undefined) || (ALLOWADDTAG == "true")) {
-            localStorage.setItem("tagsDB", JSON.stringify(tagsDB));
+            //localStorage.setItem("tagsDB", JSON.stringify(tagsDB));
             // now actually do the query
             if (newtick) {
                 // if newtick = true, post to /get/done adddone=hash
@@ -1103,8 +1106,10 @@ var TagsOuter = React.createClass({
             var fronthash = "?startkey=" + encodeURIComponent('"front page' + '"') +
                 "&endkey=" + encodeURIComponent('"front page' + '\\ufff0' + '"') +
                 "&include_docs=true";
-            if (location.href.match(/tag:/)) {
-                var wordtag = location.href.match(/tag:/)[0].replace("tag:", "");
+            if (location.href.match(/tag:.*/)) {
+                //console.log(location.href.match(/tag:.*/));
+                var wordtag = decodeURIComponent(location.href.match(/tag:.*/)[0].replace("tag:", ""));
+                console.log(wordtag);
                 fronthash = "?startkey=" + encodeURIComponent('"' + wordtag + '"') +
                     "&endkey=" + encodeURIComponent('"' + wordtag + '\\ufff0' + '"') +
                     "&include_docs=true";
