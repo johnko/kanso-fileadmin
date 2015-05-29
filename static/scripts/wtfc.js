@@ -136,7 +136,7 @@ var MetaFileIcon = React.createClass({
             if (this.props.content_type.match(/image/)) {
                 $(divid).append($('<img/>').attr({
                     "id": "preview" + this.props.sha512,
-                    "src": "./raw/" + this.props.sha512
+                    "src": "/dtfc/" + this.props.sha512
                 }).addClass("previewimage"));
                 $(divid).attr(
                     "style", "display:block!important"
@@ -146,7 +146,7 @@ var MetaFileIcon = React.createClass({
                     "id": "preview" + this.props.sha512,
                     "controls": "controls"
                 }).addClass("previewaudio").append($('<source/>').attr({
-                    "src": "./raw/" + this.props.sha512,
+                    "src": "/dtfc/" + this.props.sha512,
                     "type": this.props.content_type
                 })));
                 $(divid).attr(
@@ -163,7 +163,7 @@ var MetaFileIcon = React.createClass({
                         $(this).get(0).pause();
                     }
                 }).append($('<source/>').attr({
-                    "src": "./raw/" + this.props.sha512,
+                    "src": "/dtfc/" + this.props.sha512,
                     "type": this.props.content_type
                 })));
                 $(divid).attr(
@@ -446,7 +446,7 @@ var TagTableRow = React.createClass({
                 rawbutton = (
                     React.createElement("a", {
                             className: "btn btn-warning",
-                            href: "./raw/" + this.props.sha512
+                            href: "./dtfc/" + this.props.sha512
                         },
                         React.createElement("span", {
                             className: "glyphicon glyphicon-download-alt",
@@ -1124,12 +1124,16 @@ var TagsOuter = React.createClass({
                 //console.log(location.href.match(/tag:.*/));
                 var wordtag = decodeURIComponent(location.href.match(/tag:.*/)[0].replace("tag:", ""));
                 //console.log(wordtag);
-                fronthash = "?startkey=" + encodeURIComponent('"' + wordtag + '"') +
-                    "&endkey=" + encodeURIComponent('"' + wordtag + '\\ufff0' + '"') +
-                    "&include_docs=true";
+                if (wordtag.trim().length > 0) {
+                    fronthash = "./_ddoc/_view/tag?startkey=" + encodeURIComponent('"' + wordtag + '"') +
+                        "&endkey=" + encodeURIComponent('"' + wordtag + '\\ufff0' + '"') +
+                        "&include_docs=true";
+                } else {
+                    fronthash = "./_ddoc/_view/dtfcdocs?include_docs=true";
+                }
             }
             $.ajax({
-                url: "./_ddoc/_view/tag" + fronthash,
+                url: fronthash,
                 dataType: 'json',
                 success: function(data) {
                     tagsDBRefreshMeta(data);

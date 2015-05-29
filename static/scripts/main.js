@@ -64,12 +64,8 @@
     function sequencialupload() {
         if (!uploading) {
             if (queue.length > 0) {
-                var puturl = location.href;
-                if (puturl.match(/#/)) puturl = puturl.split("#")[0];
-                if (puturl.match(/\?/)) puturl = puturl.split("?")[0];
-                while (puturl.match(/\/$/)) puturl = puturl.replace(/\/$/, "");
                 // start upload
-                queue[0].open("PUT", puturl + "/" + fq[0].name, true); //NONROOTPATH
+                queue[0].open("PUT", "/dtfc/" + fq[0].name, true); //NONROOTPATH
                 queue[0].setRequestHeader("X_FILENAME", fq[0].name);
                 queue[0].send(fq[0]);
                 uploading = true;
@@ -102,7 +98,30 @@
                     // progress.className = (xhr.status == 200 ? "success" : "failure");
                     if (xhr.status == 200) {
                         $(li).html(linguist("Success", file.name));
-                        tagsDBRefreshMeta(JSON.parse(xhr.responseText));
+                        var dtfc = JSON.parse(xhr.responseText);
+                        dtfc.time = new Date();
+                        console.log({
+                            "dtfc": dtfc
+                        });
+                        var newdoc = {
+                            "_id": dtfc.sha512,
+                            "dtfc": {},
+                            "tags": dtfc.content_type.split("/")
+                        };
+                        newdoc.dtfc[file.name] = dtfc;
+                        newdoc.tags.push("recent files");
+                        $.ajax({
+                            type: "PUT",
+                            url: "./_db/" + dtfc.sha512,
+                            dataType: 'json',
+                            data: JSON.stringify(newdoc),
+                            success: function(data) {},
+                            error: function(xhr, status, err) {
+                                var s = "Error (" + xhr.status + ") " + err.toString();
+                                console.error(s);
+                                alert(s);
+                            }
+                        });
                     } else {
                         $(li).html(linguist("ErrorDuringUploadOfFile",
                             xhr.status, file.name));
