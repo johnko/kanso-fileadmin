@@ -1433,7 +1433,9 @@ var TagsOuter = React.createClass({
                 )
             );
         }
+        /*
         if (getHashFromLocation()) {
+        */
             return (
                 React.createElement("div", {
                         className: "tagsouter"
@@ -1457,6 +1459,7 @@ var TagsOuter = React.createClass({
                     viewTagsAs
                 )
             );
+        /*
         } else {
             //no refresh
             return (
@@ -1481,6 +1484,7 @@ var TagsOuter = React.createClass({
                 )
             );
         }
+        */
         /*} else {
             return null;
         }*/
