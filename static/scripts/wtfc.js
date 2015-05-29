@@ -332,14 +332,14 @@ var TagTableRow = React.createClass({
         ) ? this.props.done : false;
         var newtick = (ticked) ? false : true;
         // save not now, but when we ajax
-        tagsDB[hash].done = newtick;
-        this.props.onLoadTagsFromLocal();
+        //tagsDB[hash].done = newtick;
+        //this.props.onLoadTagsFromLocal();
         if ((ALLOWADDTAG === undefined) || (ALLOWADDTAG == "true")) {
             //localStorage.setItem("tagsDB", JSON.stringify(tagsDB));
             // now actually do the query
             if (newtick) {
                 // if newtick = true, post to /get/done adddone=hash
-                var newdoc = docsDB[thishash];
+                var newdoc = docsDB[hash];
                 newdoc.tags.push("done");
                 if (newdoc.dtfc) {
                     $.each(newdoc.dtfc, function(k, v) {
@@ -362,7 +362,7 @@ var TagTableRow = React.createClass({
                 });
             } else {
                 // else newtick = false, post to /get/done delhash=hash
-                var newdoc2 = docsDB[thishash];
+                var newdoc2 = docsDB[hash];
                 var index = newdoc2.tags.indexOf("done");
                 if (index > -1) {
                     newdoc2.tags.splice(index, 1);
@@ -486,7 +486,7 @@ var TagTableRow = React.createClass({
             );
         }
         var celltime = (React.createElement("td", null));
-        if (this.props.time) {
+        if (this.props.time && (this.props.time != "2000-01-01T00:00:00.000Z")) {
             celltime = (
                 React.createElement("td", {
                         className: "tabletime"
@@ -541,7 +541,7 @@ var TagTableRow = React.createClass({
                 }, eurl)
             );
         } else {
-            if (!isFile(this.props)) {
+            if (!isFile(this.props) && (this.props.count > 0)) {
                 tagscount = (
                     React.createElement("span", {
                         className: "badge"
@@ -623,6 +623,9 @@ var TagsTable = React.createClass({
     },
     loadTagsFromLocal: function(e) {
         this.props.onLoadTagsFromLocal();
+    },
+    loadTagsFromRemote: function(e) {
+        this.props.onLoadTagsFromRemote();
     },
     clickSortNameToggle: function(e) {
         if (this.state.sortorder) {
@@ -722,8 +725,12 @@ var TagsTable = React.createClass({
                 }
                 if ((matchname) && (matchtime)) {
                     var tagcount = 0;
+                    var isDone = false;
                     if (o.tags) {
                         tagcount = o.tags.length;
+                        if (o.tags.indexOf("done") > -1) {
+                            isDone = true;
+                        }
                     }
                     tagNodesTwo.push(
                         React.createElement(TagTableRow, {
@@ -732,7 +739,7 @@ var TagsTable = React.createClass({
                             content_type: o.content_type,
                             length: o.length,
                             time: o.time,
-                            done: o.done,
+                            done: isDone,
                             count: tagcount,
                             onDeleteHash: this.deleteHash,
                             onLoadTagsFromLocal: this.loadTagsFromLocal,
@@ -1220,6 +1227,7 @@ var TagsOuter = React.createClass({
                         onDeleteHash: this.deleteHash,
                         onChangeHideDone: this.changeHideDone,
                         onLoadTagsFromLocal: this.loadTagsFromLocal,
+                        onLoadTagsFromRemote: this.loadTagsFromRemote,
                         onClickSortNameAZ: this.clickSortNameAZ,
                         onClickSortNameZA: this.clickSortNameZA,
                         onClickSortTimeNewOld: this.clickSortTimeNewOld,
@@ -1490,7 +1498,7 @@ var TagListBButton = React.createClass({
             );
         }
         var metatime = '';
-        if (this.props.time) {
+        if (this.props.time && (this.props.time != "2000-01-01T00:00:00.000Z")) {
             metatime = (
                 React.createElement("span", {
                     className: "time",
@@ -1539,7 +1547,7 @@ var TagListBButton = React.createClass({
                 )
             );
         } else {
-            if (!isFile(this.props)) {
+            if (!isFile(this.props) && (this.props.count > 0)) {
                 tagscount = (
                     React.createElement("span", {
                         className: "badge"
