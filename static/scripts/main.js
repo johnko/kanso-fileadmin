@@ -117,6 +117,20 @@
                         };
                         newdoc.dtfc[file.name] = dtfc;
                         newdoc.tags.push("recent files");
+                        var addtagwords = $("#addtaginput").val().trim();
+                        if (addtagwords.length > 0) {
+                            if (addtagwords.match(/\//)) {
+                                $.each(
+                                    addtagwords.split("/"),
+                                    function(k, v) {
+                                        if (v.trim().length > 0) {
+                                            newdoc.tags.push(v.trim());
+                                        }
+                                    });
+                            } else {
+                                newdoc.tags.push(addtagwords);
+                            }
+                        }
                         var fileextension = file.name.substring(file.name.length - 4).toLowerCase();
                         $.each(
                             mimeTypes,
