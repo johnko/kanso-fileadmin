@@ -66,6 +66,9 @@ function tagsDBRefreshMeta(recvObj) {
                         if (o.doc.tags) {
                             v.tags = o.doc.tags;
                         }
+                        if (v.time) {} else {
+                            v.time = "2000-01-01T00:00:00.000Z";
+                        }
                         /*
                         if ((v.content_type == "tag") && (v.length === 0)) {
                             if (v.filename) {
@@ -378,6 +381,7 @@ var TagTableRow = React.createClass({
                     if (newdoc.dtfc) {
                         $.each(newdoc.dtfc, function(k, v) {
                             if (v.tags) delete v.tags;
+                            if (v.time == "2000-01-01T00:00:00.000Z") delete v.time;
                         });
                     }
                     $.ajax({
@@ -405,6 +409,7 @@ var TagTableRow = React.createClass({
                     if (newdoc2.dtfc) {
                         $.each(newdoc2.dtfc, function(k, v) {
                             if (v.tags) delete v.tags;
+                            if (v.time == "2000-01-01T00:00:00.000Z") delete v.time;
                         });
                     }
                     $.ajax({
@@ -438,6 +443,7 @@ var TagTableRow = React.createClass({
                 if (newdoc.dtfc) {
                     $.each(newdoc.dtfc, function(k, v) {
                         if (v.tags) delete v.tags;
+                        if (v.time == "2000-01-01T00:00:00.000Z") delete v.time;
                     });
                 }
                 this.props.onDeleteHash(delhash);
@@ -1226,6 +1232,7 @@ var TagsOuter = React.createClass({
         if (newdoc.dtfc) {
             $.each(newdoc.dtfc, function(k, v) {
                 if (v.tags) delete v.tags;
+                if (v.time == "2000-01-01T00:00:00.000Z") delete v.time;
             });
         }
         $.ajax({
