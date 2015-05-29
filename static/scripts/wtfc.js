@@ -446,7 +446,7 @@ var TagTableRow = React.createClass({
                 rawbutton = (
                     React.createElement("a", {
                             className: "btn btn-warning",
-                            href: "./dtfc/" + this.props.sha512
+                            href: "/dtfc/" + this.props.sha512
                         },
                         React.createElement("span", {
                             className: "glyphicon glyphicon-download-alt",
