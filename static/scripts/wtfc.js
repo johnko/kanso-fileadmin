@@ -7,7 +7,7 @@ var tagsDB = tagsDBLoad();
 /*============================================================================*/
 function isFile(obj) {
     var isfile = true;
-    if (obj.content_type.match(/image/)) {} else if (obj.content_type.match(/audio/)) {} else if (obj.content_type.match(/video/)) {} else if (obj.content_type.match(/text/)) {} else if (obj.content_type.match(/pdf/)) {} else if (obj.filename.match(/youtube\.com\/watch\?v=/)) {} else if (obj.filename.match(/\/youtu\.be\//)) {} else if (obj.filename.match(/https?:\/\/soundcloud\.com\/[^/]*\/[^/]*/)) {} else if ((obj.content_type != 'tag') && (obj.size !== 0)) {} else {
+    if (obj.content_type.match(/image/)) {} else if (obj.content_type.match(/audio/)) {} else if (obj.content_type.match(/video/)) {} else if (obj.content_type.match(/text/)) {} else if (obj.content_type.match(/pdf/)) {} else if (obj.filename.match(/youtube\.com\/watch\?v=/)) {} else if (obj.filename.match(/\/youtu\.be\//)) {} else if (obj.filename.match(/https?:\/\/soundcloud\.com\/[^/]*\/[^/]*/)) {} else if ((obj.content_type != 'tag') && (obj.length !== 0)) {} else {
         isfile = false;
     }
     return isfile;
@@ -27,9 +27,6 @@ function tagsDBRefreshMeta(recvObj) {
                         if (v.sha512) {
                             if (!tagsDB[v.sha512]) {
                                 tagsDB[v.sha512] = {};
-                            }
-                            if (v.length !== undefined) {
-                                v.size = v.length;
                             }
                             if (o.doc.tags) {
                                 v.tags = o.doc.tags;
@@ -93,8 +90,8 @@ function sortType(a, b) {
 }
 /*============================================================================*/
 function sortSize(a, b) {
-    var aw = (a.size === undefined) ? 0 : a.size;
-    var bw = (b.size === undefined) ? 0 : b.size;
+    var aw = (a.length === undefined) ? 0 : a.length;
+    var bw = (b.length === undefined) ? 0 : b.length;
     return aw - bw;
 }
 /*============================================================================*/
@@ -273,7 +270,7 @@ var MetaFileIcon = React.createClass({
                     "aria-hidden": "true"
                 })
             );
-        } else if ((this.props.content_type != 'tag') && (this.props.size !== 0)) {
+        } else if ((this.props.content_type != 'tag') && (this.props.length !== 0)) {
             typeicon = (
                 React.createElement("span", {
                     className: "glyphicon glyphicon-file",
@@ -391,7 +388,7 @@ var TagTableRow = React.createClass({
                 myclass: "typeicon"
             })
         );
-        if ((this.props.content_type != 'tag') && (this.props.size !== 0)) {
+        if ((this.props.content_type != 'tag') && (this.props.length !== 0)) {
             if ((SHOWRAWBUTTON === undefined) || (SHOWRAWBUTTON == "true")) {
                 rawbutton = (
                     React.createElement("a", {
@@ -433,12 +430,12 @@ var TagTableRow = React.createClass({
             );
         }
         var cellsize = (React.createElement("td", null));
-        if (this.props.size !== 0) {
+        if (this.props.length !== 0) {
             cellsize = (
                 React.createElement("td", {
                         className: "tablenumber"
                     },
-                    numberFormat(this.props.size)
+                    numberFormat(this.props.length)
                 )
             );
         }
@@ -522,7 +519,7 @@ var TagTableRow = React.createClass({
                         className: "tagname"
                     },
                     React.createElement("a", {
-                            href: "./get/" + this.props.sha512,
+                            href: "./" + this.props.sha512,
                             className: "tagname"
                         },
                         strippedname
@@ -686,7 +683,7 @@ var TagsTable = React.createClass({
                             sha512: o.sha512,
                             filename: o.filename,
                             content_type: o.content_type,
-                            size: o.size,
+                            length: o.length,
                             time: o.time,
                             done: o.done,
                             count: tagcount,
@@ -704,9 +701,9 @@ var TagsTable = React.createClass({
         var openclose = (this.props.hidedone) ? "-close" : "-open";
         var classObj = {
             "done": '',
-            "type": '',
-            "name": '',
-            "size": '',
+            "content_type": '',
+            "filename": '',
+            "length": '',
             "time": ''
         };
         switch (this.props.sort) {
@@ -720,7 +717,7 @@ var TagsTable = React.createClass({
                 break;
             case "sizebigsmall":
             case "sizesmallbig":
-                classObj.size = " btn-primary";
+                classObj.length = " btn-primary";
                 break;
             case "timenewold":
             case "timeoldnew":
@@ -792,7 +789,7 @@ var TagsTable = React.createClass({
                         React.createElement("th", null,
                             React.createElement("button", {
                                     type: "button",
-                                    className: "btn btn-default" + classObj.size,
+                                    className: "btn btn-default" + classObj.length,
                                     "aria-expanded": "false",
                                     onClick: this.clickSortSizeToggle
                                 },
@@ -1169,7 +1166,7 @@ var TagsOuter = React.createClass({
                     "done": '',
                     "content_type": '',
                     "filename": '',
-                    "size": '',
+                    "length": '',
                     "time": ''
                 };
                 switch (this.state.sort) {
@@ -1183,7 +1180,7 @@ var TagsOuter = React.createClass({
                         break;
                     case "sizebigsmall":
                     case "sizesmallbig":
-                        classObj.size = " btn-primary";
+                        classObj.length = " btn-primary";
                         break;
                     case "timenewold":
                     case "timeoldnew":
@@ -1231,7 +1228,7 @@ var TagsOuter = React.createClass({
                             ),
                             React.createElement("button", {
                                     type: "button",
-                                    className: "btn btn-default" + classObj.size,
+                                    className: "btn btn-default" + classObj.length,
                                     "aria-expanded": "false",
                                     onClick: this.clickSortSizeBigSmall
                                 },
@@ -1406,12 +1403,12 @@ var TagListBButton = React.createClass({
             })
         );
         var metasize = '';
-        if (this.props.size !== 0) {
+        if (this.props.length !== 0) {
             metasize = (
                 React.createElement("span", {
                         className: "size"
                     },
-                    numberFormat(this.props.size) + " bytes"
+                    numberFormat(this.props.length) + " bytes"
                 )
             );
         }
@@ -1475,7 +1472,7 @@ var TagListBButton = React.createClass({
         }
         var mainbutton = (
             React.createElement("a", {
-                    href: "./get/" + this.props.sha512,
+                    href: "./" + this.props.sha512,
                     type: "button",
                     className: "tagname"
                 },
@@ -1528,7 +1525,7 @@ var TagsListB = React.createClass({
                         sha512: o.sha512,
                         filename: o.filename,
                         content_type: o.content_type,
-                        size: o.size,
+                        length: o.length,
                         time: o.time,
                         count: tagcount
                     })
