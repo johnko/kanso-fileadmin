@@ -1109,7 +1109,7 @@ var TagsOuter = React.createClass({
             if (location.href.match(/tag:.*/)) {
                 //console.log(location.href.match(/tag:.*/));
                 var wordtag = decodeURIComponent(location.href.match(/tag:.*/)[0].replace("tag:", ""));
-                console.log(wordtag);
+                //console.log(wordtag);
                 fronthash = "?startkey=" + encodeURIComponent('"' + wordtag + '"') +
                     "&endkey=" + encodeURIComponent('"' + wordtag + '\\ufff0' + '"') +
                     "&include_docs=true";
