@@ -2,8 +2,14 @@ function tagsDBLoad() {
     var tagsDB = JSON.parse(localStorage.getItem("tagsDB"));
     return (tagsDB) ? tagsDB : {};
 }
+
+function docsDBLoad() {
+    var docsDB = JSON.parse(localStorage.getItem("docsDB"));
+    return (docsDB) ? docsDB : {};
+}
 // global
 var tagsDB = tagsDBLoad();
+var docsDB = docsDBLoad();
 /*============================================================================*/
 function isFile(obj) {
     var isfile = true;
@@ -22,6 +28,8 @@ function tagsDBRefreshMeta(recvObj) {
     if (recvObj.rows) {
         $.each(recvObj.rows, function(h, o) {
             if (o.doc) {
+                // save the doc so we can try to PUT to couchDB
+                docsDB[o.doc._id] = o.doc;
                 if (o.doc.dtfc) {
                     $.each(o.doc.dtfc, function(k, v) {
                         if (o.doc.tags) {
@@ -326,17 +334,22 @@ var TagTableRow = React.createClass({
         if ((ALLOWADDTAG === undefined) || (ALLOWADDTAG == "true")) {
             localStorage.setItem("tagsDB", JSON.stringify(tagsDB));
             // now actually do the query
-            var thishash = getHashFromLocation();
             if (newtick) {
                 // if newtick = true, post to /get/done adddone=hash
+                var newdoc = docsDB[thishash];
+                newdoc.tags.push("done");
+                if (newdoc.dtfc) {
+                    $.each(newdoc.dtfc, function(k, v) {
+                        if (v.tags) delete v.tags;
+                    });
+                }
                 $.ajax({
-                    type: "POST",
-                    url: "./_db/" + thishash,
+                    type: "PUT",
+                    url: "./_db/" + hash,
                     dataType: 'json',
-                    data: 'adddone=' + hash,
+                    data: JSON.stringify(newdoc),
                     success: function(data) {
-                        tagsDBRefreshMeta(data);
-                        this.props.onLoadTagsFromLocal();
+                        this.props.onLoadTagsFromRemote();
                     }.bind(this),
                     error: function(xhr, status, err) {
                         var s = "Error (" + xhr.status + ") " + err.toString();
@@ -346,14 +359,23 @@ var TagTableRow = React.createClass({
                 });
             } else {
                 // else newtick = false, post to /get/done delhash=hash
+                var newdoc2 = docsDB[thishash];
+                var index = newdoc2.tags.indexOf("done");
+                if (index > -1) {
+                    newdoc2.tags.splice(index, 1);
+                }
+                if (newdoc2.dtfc) {
+                    $.each(newdoc2.dtfc, function(k, v) {
+                        if (v.tags) delete v.tags;
+                    });
+                }
                 $.ajax({
-                    type: "POST",
-                    url: "./_db/" + thishash,
+                    type: "PUT",
+                    url: "./_db/" + hash,
                     dataType: 'json',
-                    data: 'deldone=' + hash,
+                    data: JSON.stringify(newdoc2),
                     success: function(data) {
-                        tagsDBRefreshMeta(data);
-                        this.props.onLoadTagsFromLocal();
+                        this.props.onLoadTagsFromRemote();
                     }.bind(this),
                     error: function(xhr, status, err) {
                         var s = "Error (" + xhr.status + ") " + err.toString();
@@ -365,28 +387,39 @@ var TagTableRow = React.createClass({
         }
     },
     deleteHash: function(e) {
-        var thishash = getHashFromLocation();
         var delhash = this.props.sha512;
+        var thishash = getHashFromLocation();
         if (thishash) {
-            this.props.onDeleteHash(delhash);
-            $.ajax({
-                type: "POST",
-                url: "./_db/" + thishash,
-                dataType: 'json',
-                data: 'delhash=' + delhash,
-                success: function(data) {
-                    tagsDBRefreshMeta(data);
-                    this.props.onLoadTagsFromLocal();
-                }.bind(this),
-                error: function(xhr, status, err) {
-                    var s = "Error (" + xhr.status + ") " + err.toString();
-                    console.error(s);
-                    alert(s);
-                }.bind(this)
-            });
+            if (delhash) {
+                var newdoc = docsDB[thishash];
+                var index = newdoc.tags.indexOf(delhash);
+                if (index > -1) {
+                    newdoc.tags.splice(index, 1);
+                }
+                if (newdoc.dtfc) {
+                    $.each(newdoc.dtfc, function(k, v) {
+                        if (v.tags) delete v.tags;
+                    });
+                }
+                this.props.onDeleteHash(delhash);
+                $.ajax({
+                    type: "PUT",
+                    url: "./_db/" + thishash,
+                    dataType: 'json',
+                    data: JSON.stringify(newdoc),
+                    success: function(data) {
+                        this.props.onLoadTagsFromRemote();
+                    }.bind(this),
+                    error: function(xhr, status, err) {
+                        var s = "Error (" + xhr.status + ") " + err.toString();
+                        console.error(s);
+                        alert(s);
+                    }.bind(this)
+                });
+            }
+            // make sure another Trash button is not selected
+            $("#hiddenfocus").focus();
         }
-        // make sure another Trash button is not selected
-        $("#hiddenfocus").focus();
     },
     render: function() {
         var rawbutton = '';
@@ -513,6 +546,7 @@ var TagTableRow = React.createClass({
                 );
             }
         }
+        var linkhref = (this.props.sha512) ? "sha512:" + this.props.sha512 : "tag:" + this.props.filename;
         return (
             React.createElement("tr", {
                     className: "tagitem " + doneClass
@@ -529,7 +563,7 @@ var TagTableRow = React.createClass({
                         className: "tagname"
                     },
                     React.createElement("a", {
-                            href: "./" + this.props.sha512,
+                            href: "./" + linkhref,
                             className: "tagname"
                         },
                         strippedname
@@ -698,7 +732,8 @@ var TagsTable = React.createClass({
                             done: o.done,
                             count: tagcount,
                             onDeleteHash: this.deleteHash,
-                            onLoadTagsFromLocal: this.loadTagsFromLocal
+                            onLoadTagsFromLocal: this.loadTagsFromLocal,
+                            onLoadTagsFromRemote: this.loadTagsFromRemote
                         })
                     );
                 }
@@ -998,6 +1033,15 @@ var TagsOuter = React.createClass({
                 $.each(tagsDB[hash].tags, function(i, h) {
                     if (tagsDB[h]) {
                         obj[h] = tagsDB[h];
+                    } else {
+                        if (h.match(/[0-9a-f]{128}/)) {} else {
+                            obj[h] = {
+                                "filename": h,
+                                "content_type": "tag",
+                                "length": 0,
+                                "time": "2000-01-01T00:00:00.000Z"
+                            };
+                        }
                     }
                 });
                 return obj;
@@ -1059,6 +1103,12 @@ var TagsOuter = React.createClass({
             var fronthash = "?startkey=" + encodeURIComponent('"front page' + '"') +
                 "&endkey=" + encodeURIComponent('"front page' + '\\ufff0' + '"') +
                 "&include_docs=true";
+            if (location.href.match(/tag:/)) {
+                var wordtag = location.href.match(/tag:/)[0].replace("tag:", "");
+                fronthash = "?startkey=" + encodeURIComponent('"' + wordtag + '"') +
+                    "&endkey=" + encodeURIComponent('"' + wordtag + '\\ufff0' + '"') +
+                    "&include_docs=true";
+            }
             $.ajax({
                 url: "./_ddoc/_view/tag" + fronthash,
                 dataType: 'json',
@@ -1116,16 +1166,20 @@ var TagsOuter = React.createClass({
     addTag: function(event) {
         event.preventDefault();
         var thishash = getHashFromLocation();
+        var newdoc = docsDB[thishash];
+        newdoc.tags.push($("#addtaginput").val().trim());
+        if (newdoc.dtfc) {
+            $.each(newdoc.dtfc, function(k, v) {
+                if (v.tags) delete v.tags;
+            });
+        }
         $.ajax({
-            type: "POST",
+            type: "PUT",
             url: "./_db/" + thishash,
             dataType: 'json',
-            data: ({
-                "addtag": $("#addtaginput").val().trim()
-            }),
+            data: JSON.stringify(newdoc),
             success: function(data) {
-                tagsDBRefreshMeta(data);
-                this.loadTagsFromLocal();
+                this.loadTagsFromRemote();
                 $("#addtaginput").val('');
             }.bind(this),
             error: function(xhr, status, err) {
@@ -1488,9 +1542,10 @@ var TagListBButton = React.createClass({
                 );
             }
         }
+        var linkhref = (this.props.sha512) ? "sha512:" + this.props.sha512 : "tag:" + this.props.filename;
         var mainbutton = (
             React.createElement("a", {
-                    href: "./" + this.props.sha512,
+                    href: "./" + linkhref,
                     type: "button",
                     className: "tagname"
                 },
