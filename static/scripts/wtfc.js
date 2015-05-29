@@ -29,10 +29,12 @@ function tagsDBRefreshMeta(recvObj) {
                         }
                         if ((v.content_type == "tag") && (v.length === 0)) {
                             if (v.filename) {
-                                if (!tagsDB[v.filename]) {
-                                    tagsDB[v.filename] = {};
+                                if (v.filename.match(/[0-9a-f]{128}/)) {} else {
+                                    if (!tagsDB[v.filename]) {
+                                        tagsDB[v.filename] = {};
+                                    }
+                                    tagsDB[v.filename] = v;
                                 }
-                                tagsDB[v.filename] = v;
                             }
                         }
                         if (v.sha512) {
@@ -980,6 +982,15 @@ var TagsOuter = React.createClass({
             o.click();
         });
     },
+    sha512only: function() {
+        var obj = {};
+        $.each(tagsDB, function(i, h) {
+            if (i.match(/[0-9a-f]{128}/)) {
+                obj[i] = h;
+            }
+        });
+        return obj;
+    },
     hashesToObject: function(hash) {
         var obj = {};
         if (tagsDB[hash]) {
@@ -1003,7 +1014,8 @@ var TagsOuter = React.createClass({
             tagsObj = (hto) ? hto : false;
         } else {
             //DEBUGconsole.log('TagsOuter loadTagsFromLocal all tagsDB cached');
-            tagsObj = (tagsDB) ? tagsDB : false;
+            var hto2 = this.sha512only();
+            tagsObj = (hto2) ? hto2 : false;
         }
         if (tagsObj) {
             // parse all objects
