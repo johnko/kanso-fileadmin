@@ -25,6 +25,10 @@ function getHashFromLocation() {
     var hash = location.href.match(/[0-9a-f]{128}/);
     return (hash) ? hash : false;
 }
+function setNameHeader(name) {
+    $("h2.page-header").html(name);
+    $("#classify-header").html(name);
+}
 /*============================================================================*/
 function setCardDetails(recvObj) {
     if (recvObj.rows) {
@@ -34,8 +38,7 @@ function setCardDetails(recvObj) {
                     var found = false;
                     $.each(recvObj.rows[0].doc.dtfc, function(k, v) {
                         if (!found) {
-                            $("h2.page-header").html(v.filename);
-                            $("#classify-header").html(v.filename);
+                            setNameHeader(v.filename);
                             $("#card-details-body").html(
                                 "<p>" + v.content_type + "</p>" +
                                 "<p>" + numberFormat(v.length) + " bytes</p>" +
@@ -1149,9 +1152,10 @@ var TagsOuter = React.createClass({
                 "&include_docs=true";
             if (location.href.match(/tag:.*/)) {
                 //console.log(location.href.match(/tag:.*/));
-                var wordtag = decodeURIComponent(location.href.match(/tag:.*/)[0].replace("tag:", ""));
+                var wordtag = decodeURIComponent(location.href.match(/tag:.*/)[0].replace("tag:", "").trim());
                 //console.log(wordtag);
-                if (wordtag.trim().length > 0) {
+                if (wordtag.length > 0) {
+                    setNameHeader(wordtag);
                     fronthash = "./_ddoc/_view/tag?startkey=" + encodeURIComponent('"' + wordtag + '"') +
                         "&endkey=" + encodeURIComponent('"' + wordtag + '\\ufff0' + '"') +
                         "&include_docs=true";
