@@ -37,6 +37,7 @@ function tagsDBRefreshMeta(recvObj) {
                         if (o.doc.tags) {
                             v.tags = o.doc.tags;
                         }
+                        /*
                         if ((v.content_type == "tag") && (v.length === 0)) {
                             if (v.filename) {
                                 if (v.filename.match(/[0-9a-f]{128}/)) {} else {
@@ -47,6 +48,7 @@ function tagsDBRefreshMeta(recvObj) {
                                 }
                             }
                         }
+                        */
                         if (v.sha512) {
                             if (!tagsDB[v.sha512]) {
                                 tagsDB[v.sha512] = {};
