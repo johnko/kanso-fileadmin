@@ -26,6 +26,32 @@ function getHashFromLocation() {
     return (hash) ? hash : false;
 }
 /*============================================================================*/
+function setCardDetails(recvObj) {
+    if (recvObj.rows) {
+        if (recvObj.rows[0]) {
+            if (recvObj.rows[0].doc) {
+                if (recvObj.rows[0].doc.dtfc) {
+                    var found = false;
+                    $.each(recvObj.rows[0].doc.dtfc, function(k, v) {
+                        if (!found) {
+                            $("h2.page-header").html(v.filename);
+                            $("#classify-header").html(v.filename);
+                            $("#card-details-body").html(
+                                "<p>" + v.content_type + "</p>" +
+                                "<p>" + numberFormat(v.length) + " bytes</p>" +
+                                '<p><span title="' + v.time + '" data-livestamp="' + Date.parse(v.time) / 1000 + '"></span></p>' +
+                                '<p><a href="/dtfc/' + v.sha512 + '" class="btn btn-warning">download</a></p>'
+                            );
+                            $("#card-details").show();
+                            found = true;
+                        }
+                    });
+                }
+            }
+        }
+    }
+}
+/*============================================================================*/
 function tagsDBRefreshMeta(recvObj) {
     if (recvObj.rows) {
         $.each(recvObj.rows, function(h, o) {
@@ -1107,6 +1133,7 @@ var TagsOuter = React.createClass({
                 dataType: 'json',
                 success: function(data) {
                     tagsDBRefreshMeta(data);
+                    setCardDetails(data);
                     this.loadTagsFromLocal();
                 }.bind(this),
                 error: function(xhr, status, err) {
@@ -1436,29 +1463,29 @@ var TagsOuter = React.createClass({
         /*
         if (getHashFromLocation()) {
         */
-            return (
+        return (
+            React.createElement("div", {
+                    className: "tagsouter"
+                },
+                React.createElement("h4", null, this.props.title),
+                addtagform,
                 React.createElement("div", {
-                        className: "tagsouter"
+                        className: "pull-left tagoptions"
                     },
-                    React.createElement("h4", null, this.props.title),
-                    addtagform,
                     React.createElement("div", {
-                            className: "pull-left tagoptions"
+                            className: "btn-group",
+                            role: "group",
+                            "aria-label": "..."
                         },
-                        React.createElement("div", {
-                                className: "btn-group",
-                                role: "group",
-                                "aria-label": "..."
-                            },
-                            tabletile,
-                            previewall,
-                            refresh
-                        )
-                    ),
-                    tagSortBar,
-                    viewTagsAs
-                )
-            );
+                        tabletile,
+                        previewall,
+                        refresh
+                    )
+                ),
+                tagSortBar,
+                viewTagsAs
+            )
+        );
         /*
         } else {
             //no refresh
