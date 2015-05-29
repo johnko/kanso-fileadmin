@@ -223,7 +223,7 @@
         $('h2.page-header').html(strippedname + externalurl);
         $('span#classify-header').html(strippedname + externalurl);
 
-        tagsFor("card-suggested", "Cached Tags");
+        tagsFor("card-suggested", "");
         tagsFor("card-tags", '');
     });
     $(window).bind("beforeunload", function() {
