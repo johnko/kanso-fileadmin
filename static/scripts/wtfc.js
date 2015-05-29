@@ -1153,7 +1153,7 @@ var TagsOuter = React.createClass({
             });
         } else {
             // get tags "front page" only if not get hash
-            var fronthash = "?startkey=" + encodeURIComponent('"front page' + '"') +
+            var fronthash = "./_ddoc/_view/tag?startkey=" + encodeURIComponent('"front page' + '"') +
                 "&endkey=" + encodeURIComponent('"front page' + '\\ufff0' + '"') +
                 "&include_docs=true";
             if (location.href.match(/tag:.*/)) {

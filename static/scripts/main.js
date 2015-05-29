@@ -3,7 +3,7 @@
         Variables
     */
     var language = "en-US";
-    var theme = "dark";
+    var theme = "bright";
     var queue = Array();
     var fq = Array();
     var uploading = false;
