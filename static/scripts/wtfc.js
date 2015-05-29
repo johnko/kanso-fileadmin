@@ -24,12 +24,20 @@ function tagsDBRefreshMeta(recvObj) {
             if (o.doc) {
                 if (o.doc.dtfc) {
                     $.each(o.doc.dtfc, function(k, v) {
+                        if (o.doc.tags) {
+                            v.tags = o.doc.tags;
+                        }
+                        if ((v.content_type == "tag") && (v.length === 0)) {
+                            if (v.filename) {
+                                if (!tagsDB[v.filename]) {
+                                    tagsDB[v.filename] = {};
+                                }
+                                tagsDB[v.filename] = v;
+                            }
+                        }
                         if (v.sha512) {
                             if (!tagsDB[v.sha512]) {
                                 tagsDB[v.sha512] = {};
-                            }
-                            if (o.doc.tags) {
-                                v.tags = o.doc.tags;
                             }
                             tagsDB[v.sha512] = v;
                         }
@@ -1000,7 +1008,7 @@ var TagsOuter = React.createClass({
         if (tagsObj) {
             // parse all objects
             $.each(tagsObj, function(h, o) {
-                o.sha512 = h;
+                //o.sha512 = h;
                 tagsArray.push(o);
             });
         }
@@ -1016,26 +1024,24 @@ var TagsOuter = React.createClass({
     },
     loadTagsFromRemote: function() {
         if (getHashFromLocation()) {
-            if (location.href.match(/\/get\//)) {
-                //DEBUGconsole.log('TagsOuter loadTagsFromRemote AJAX');
-                var thishash = getHashFromLocation();
-                var queryhash = "?startkey=" + encodeURIComponent('"' + thishash + '"') +
-                    "&endkey=" + encodeURIComponent('"' + thishash + '\\ufff0' + '"') +
-                    "&include_docs=true";
-                $.ajax({
-                    url: "./_ddoc/_view/dtfcdocs" + queryhash,
-                    dataType: 'json',
-                    success: function(data) {
-                        tagsDBRefreshMeta(data);
-                        this.loadTagsFromLocal();
-                    }.bind(this),
-                    error: function(xhr, status, err) {
-                        var s = "Error (" + xhr.status + ") " + err.toString();
-                        console.error(s);
-                        //silent the timed fetch errors alert(s);
-                    }.bind(this)
-                });
-            }
+            //DEBUGconsole.log('TagsOuter loadTagsFromRemote AJAX');
+            var thishash = getHashFromLocation();
+            var queryhash = "?startkey=" + encodeURIComponent('"' + thishash + '"') +
+                "&endkey=" + encodeURIComponent('"' + thishash + '\\ufff0' + '"') +
+                "&include_docs=true";
+            $.ajax({
+                url: "./_ddoc/_view/dtfcdocs" + queryhash,
+                dataType: 'json',
+                success: function(data) {
+                    tagsDBRefreshMeta(data);
+                    this.loadTagsFromLocal();
+                }.bind(this),
+                error: function(xhr, status, err) {
+                    var s = "Error (" + xhr.status + ") " + err.toString();
+                    console.error(s);
+                    //silent the timed fetch errors alert(s);
+                }.bind(this)
+            });
         } else {
             // get tags "front page" only if not get hash
             var fronthash = "?startkey=" + encodeURIComponent('"front page' + '"') +
