@@ -337,55 +337,60 @@ var TagTableRow = React.createClass({
         if ((ALLOWADDTAG === undefined) || (ALLOWADDTAG == "true")) {
             //localStorage.setItem("tagsDB", JSON.stringify(tagsDB));
             // now actually do the query
-            if (newtick) {
-                // if newtick = true, post to /get/done adddone=hash
-                var newdoc = docsDB[hash];
-                newdoc.tags.push("done");
-                if (newdoc.dtfc) {
-                    $.each(newdoc.dtfc, function(k, v) {
-                        if (v.tags) delete v.tags;
+            if (hash) {
+                if (newtick) {
+                    // if newtick = true, post to /get/done adddone=hash
+
+                    // only ajax if we are on an actual file
+                    var newdoc = docsDB[hash];
+                    newdoc.tags.push("done");
+                    if (newdoc.dtfc) {
+                        $.each(newdoc.dtfc, function(k, v) {
+                            if (v.tags) delete v.tags;
+                        });
+                    }
+                    $.ajax({
+                        type: "PUT",
+                        url: "./_db/" + hash,
+                        dataType: 'json',
+                        data: JSON.stringify(newdoc),
+                        success: function(data) {
+                            this.props.onLoadTagsFromRemote();
+                        }.bind(this),
+                        error: function(xhr, status, err) {
+                            var s = "Error (" + xhr.status + ") " + err.toString();
+                            console.error(s);
+                            alert(s);
+                        }.bind(this)
+                    });
+
+                } else {
+                    // else newtick = false, post to /get/done delhash=hash
+                    var newdoc2 = docsDB[hash];
+                    var index = newdoc2.tags.indexOf("done");
+                    if (index > -1) {
+                        newdoc2.tags.splice(index, 1);
+                    }
+                    if (newdoc2.dtfc) {
+                        $.each(newdoc2.dtfc, function(k, v) {
+                            if (v.tags) delete v.tags;
+                        });
+                    }
+                    $.ajax({
+                        type: "PUT",
+                        url: "./_db/" + hash,
+                        dataType: 'json',
+                        data: JSON.stringify(newdoc2),
+                        success: function(data) {
+                            this.props.onLoadTagsFromRemote();
+                        }.bind(this),
+                        error: function(xhr, status, err) {
+                            var s = "Error (" + xhr.status + ") " + err.toString();
+                            console.error(s);
+                            alert(s);
+                        }.bind(this)
                     });
                 }
-                $.ajax({
-                    type: "PUT",
-                    url: "./_db/" + hash,
-                    dataType: 'json',
-                    data: JSON.stringify(newdoc),
-                    success: function(data) {
-                        this.props.onLoadTagsFromRemote();
-                    }.bind(this),
-                    error: function(xhr, status, err) {
-                        var s = "Error (" + xhr.status + ") " + err.toString();
-                        console.error(s);
-                        alert(s);
-                    }.bind(this)
-                });
-            } else {
-                // else newtick = false, post to /get/done delhash=hash
-                var newdoc2 = docsDB[hash];
-                var index = newdoc2.tags.indexOf("done");
-                if (index > -1) {
-                    newdoc2.tags.splice(index, 1);
-                }
-                if (newdoc2.dtfc) {
-                    $.each(newdoc2.dtfc, function(k, v) {
-                        if (v.tags) delete v.tags;
-                    });
-                }
-                $.ajax({
-                    type: "PUT",
-                    url: "./_db/" + hash,
-                    dataType: 'json',
-                    data: JSON.stringify(newdoc2),
-                    success: function(data) {
-                        this.props.onLoadTagsFromRemote();
-                    }.bind(this),
-                    error: function(xhr, status, err) {
-                        var s = "Error (" + xhr.status + ") " + err.toString();
-                        console.error(s);
-                        alert(s);
-                    }.bind(this)
-                });
             }
         }
     },
