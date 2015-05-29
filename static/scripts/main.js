@@ -7,6 +7,13 @@
     var queue = Array();
     var fq = Array();
     var uploading = false;
+    var mimeTypes = {
+        "audio": [".mp3", ".wav", ".m4a", ".oga"],
+        "image": [".jpg", ".gif", ".png", "jpeg", "tiff", ".ps", ".svg", ".xcf"],
+        "pdf": [".pdf"],
+        "text": [".txt", ".log", "html", ".css", ".js", ".sh", ".md", "conf", ".php", ".jsx", ".xml"],
+        "video": [".mp4", ".webm", ".ogv", ".mkv", "gifv"]
+    };
     /*
         Translations?
     */
@@ -110,6 +117,18 @@
                         };
                         newdoc.dtfc[file.name] = dtfc;
                         newdoc.tags.push("recent files");
+                        var fileextension = file.name.substring(file.name.length - 4).toLowerCase();
+                        $.each(
+                            mimeTypes,
+                            function(k, v) {
+                                if (v.indexOf(fileextension) > -1) newdoc.tags.push(k);
+                            });
+                        fileextension = file.name.substring(file.name.length - 3).toLowerCase();
+                        $.each(
+                            mimeTypes,
+                            function(k, v) {
+                                if (v.indexOf(fileextension) > -1) newdoc.tags.push(k);
+                            });
                         $.ajax({
                             type: "PUT",
                             url: "./_db/" + dtfc.sha512,
