@@ -319,15 +319,12 @@ var TagTableRow = React.createClass({
         if ((ALLOWADDTAG === undefined) || (ALLOWADDTAG == "true")) {
             localStorage.setItem("tagsDB", JSON.stringify(tagsDB));
             // now actually do the query
-            var donehash = "07b8a32b38151e20c27bf64ee5fa32cf2f19e2ef0f749e50" +
-                "ecf8069a368eddd1f0822b7b4dea7e8380d9e26425efbeb54ccac432c09" +
-                "b75b82356afcf94cec37d";
+            var thishash = getHashFromLocation();
             if (newtick) {
                 // if newtick = true, post to /get/done adddone=hash
                 $.ajax({
                     type: "POST",
-                    url: location.href.match(/https?:\/\/[^\/]*/) +
-                        NONROOTPATH + "/get/" + donehash,
+                    url: "./_db/" + thishash,
                     dataType: 'json',
                     data: 'adddone=' + hash,
                     success: function(data) {
@@ -344,8 +341,7 @@ var TagTableRow = React.createClass({
                 // else newtick = false, post to /get/done delhash=hash
                 $.ajax({
                     type: "POST",
-                    url: location.href.match(/https?:\/\/[^\/]*/) +
-                        NONROOTPATH + "/get/" + donehash,
+                    url: "./_db/" + thishash,
                     dataType: 'json',
                     data: 'deldone=' + hash,
                     success: function(data) {
@@ -362,13 +358,13 @@ var TagTableRow = React.createClass({
         }
     },
     deleteHash: function(e) {
-        var hash = getHashFromLocation();
+        var thishash = getHashFromLocation();
         var delhash = this.props.sha512;
-        if (hash) {
+        if (thishash) {
             this.props.onDeleteHash(delhash);
             $.ajax({
                 type: "POST",
-                url: location.href,
+                url: "./_db/" + thishash,
                 dataType: 'json',
                 data: 'delhash=' + delhash,
                 success: function(data) {
@@ -1025,8 +1021,12 @@ var TagsOuter = React.createClass({
         if (getHashFromLocation()) {
             if (location.href.match(/\/get\//)) {
                 //DEBUGconsole.log('TagsOuter loadTagsFromRemote AJAX');
+                var thishash = getHashFromLocation();
+                var queryhash = "?startkey=" + encodeURIComponent('"' + thishash + '"') +
+                    "&endkey=" + encodeURIComponent('"' + thishash + '\\ufff0' + '"') +
+                    "&include_docs=true";
                 $.ajax({
-                    url: location.href.replace(/\/get\//, "/tags/"),
+                    url: "./_ddoc/_view/dtfcdocs" + queryhash,
                     dataType: 'json',
                     success: function(data) {
                         tagsDBRefreshMeta(data);
@@ -1100,9 +1100,10 @@ var TagsOuter = React.createClass({
     },
     addTag: function(event) {
         event.preventDefault();
+        var thishash = getHashFromLocation();
         $.ajax({
             type: "POST",
-            url: location.href,
+            url: "./_db/" + thishash,
             dataType: 'json',
             data: ({
                 "addtag": $("#addtaginput").val().trim()
